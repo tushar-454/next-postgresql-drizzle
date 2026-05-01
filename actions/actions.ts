@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { usersTable } from "@/lib/db/schema";
+import { postsTable, usersTable } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate";
 
@@ -80,6 +80,42 @@ export async function deleteUser(formData: FormData) {
         };
     } catch (error) {
         console.error("Error deleting user:", error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Delete failed",
+        };
+    }
+}
+
+export async function createPost(formData: FormData) {
+    try {
+        const title = formData.get("title") as string;
+        const content = formData.get("content") as string;
+        const userId = Number(formData.get("userId"));
+        await db.insert(postsTable).values({
+            title,
+            content,
+            userId,
+        });
+
+        revalidatePath("/");
+        return { success: true };
+    } catch (error) {
+        console.error(error);
+        return { success: false };
+    }
+}
+
+export async function deletePost(formData: FormData) {
+    try {
+        const id = Number(formData.get("id"));
+        await db.delete(postsTable).where(eq(postsTable.id, id));
+        revalidatePath("/");
+        return {
+            success: true,
+        };
+    } catch (error) {
+        console.error("Error deleting post:", error);
         return {
             success: false,
             error: error instanceof Error ? error.message : "Delete failed",

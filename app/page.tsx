@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import UsersList from "@/components/users-list";
+import UsersListPosts from "@/components/users-list-posts";
 import Link from "next/link";
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
             </div>
 
             <UsersList />
+            <UsersListPosts />
         </main>
     );
 }

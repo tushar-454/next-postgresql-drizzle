@@ -1,17 +1,6 @@
-import { db } from "@/lib/db";
-import { usersTable } from "@/lib/db/schema";
-import { like, or } from "drizzle-orm";
+import { getUsers } from "@/queries";
 import DeleteUserButton from "./delete-user-button";
 import UserBadge from "./user-badge";
-
-async function getUsers() {
-    const users = await db
-        .select()
-        .from(usersTable)
-        .where(or(like(usersTable.email, "%gmail%")))
-        .orderBy(usersTable.id);
-    return users;
-}
 
 export default async function Home() {
     const users = await getUsers();
