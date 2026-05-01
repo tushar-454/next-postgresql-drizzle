@@ -3,27 +3,33 @@ import {
     boolean,
     integer,
     pgTable,
-    serial,
-    text,
     timestamp,
+    varchar,
 } from "drizzle-orm/pg-core";
 
+// columns.helpers.ts
+const timestamps = {
+    createdAt: timestamp().defaultNow(),
+    updatedAt: timestamp().defaultNow().notNull(),
+    deletedAt: timestamp(),
+};
+
 export const usersTable = pgTable("users", {
-    id: serial("id").primaryKey(),
-    name: text("name").notNull(),
-    email: text("email").notNull().unique(),
-    isActive: boolean("is_active").default(true),
-    createdAt: timestamp("created_at").defaultNow(),
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    name: varchar({ length: 20 }).notNull(),
+    email: varchar({ length: 50 }).notNull().unique(),
+    isActive: boolean().default(true),
+    ...timestamps,
 });
 
 export const postsTable = pgTable("posts", {
-    id: serial("id").primaryKey(),
-    title: text("title").notNull(),
-    content: text("content").notNull(),
-    userId: integer("user_id")
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    title: varchar({ length: 100 }).notNull(),
+    content: varchar({ length: 255 }).notNull(),
+    userId: integer()
         .notNull()
         .references(() => usersTable.id),
-    createdAt: timestamp("created_at").defaultNow(),
+    ...timestamps,
 });
 
 export const usersRelations = relations(usersTable, ({ many }) => ({
