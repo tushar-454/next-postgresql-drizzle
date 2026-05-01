@@ -2,6 +2,7 @@
 
 import { db } from "@/lib/db";
 import { usersTable } from "@/lib/db/schema";
+import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate";
 
 export async function createUser(formData: FormData) {
     const name = formData.get("name") as string;
@@ -16,6 +17,7 @@ export async function createUser(formData: FormData) {
             })
             .returning();
         console.log("New user created:", newUser);
+        revalidatePath("/");
         return {
             success: true,
             data: newUser,
