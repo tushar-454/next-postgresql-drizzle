@@ -32,6 +32,25 @@ export async function createUser(formData: FormData) {
     }
 }
 
+export async function updateUser(formData: FormData) {
+    try {
+        const id = Number(formData.get("id"));
+        const name = formData.get("name") as string;
+
+        await db.update(usersTable).set({ name }).where(eq(usersTable.id, id));
+        revalidatePath("/");
+        return {
+            success: true,
+        };
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : "Update failed",
+        };
+    }
+}
+
 export async function deleteUser(formData: FormData) {
     try {
         const id = Number(formData.get("id"));

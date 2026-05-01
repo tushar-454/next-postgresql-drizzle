@@ -1,9 +1,18 @@
 import { db } from "@/lib/db";
 import { usersTable } from "@/lib/db/schema";
+import { like, or } from "drizzle-orm";
 import DeleteUserButton from "./delete-user-button";
 
 async function getUsers() {
-    const users = await db.select().from(usersTable).orderBy(usersTable.id);
+    const users = await db
+        .select({
+            id: usersTable.id,
+            name: usersTable.name,
+            email: usersTable.email,
+        })
+        .from(usersTable)
+        .where(or(like(usersTable.email, "%gmail%")))
+        .orderBy(usersTable.id);
     return users;
 }
 
