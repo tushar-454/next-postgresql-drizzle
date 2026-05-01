@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { usersTable } from "@/lib/db/schema";
-import { Button } from "./ui/button";
+import DeleteUserButton from "./delete-user-button";
 
 async function getUsers() {
     const users = await db.select().from(usersTable).orderBy(usersTable.id);
@@ -30,7 +30,7 @@ export default async function Home() {
                                 </p>
                             </div>
                             {/* We will create this component in Step 3 */}
-                            <Button>Delete </Button>
+                            <DeleteUserButton userId={user.id} />
                         </div>
                     ))
                 )}
