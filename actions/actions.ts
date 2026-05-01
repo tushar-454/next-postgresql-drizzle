@@ -36,8 +36,27 @@ export async function updateUser(formData: FormData) {
     try {
         const id = Number(formData.get("id"));
         const name = formData.get("name") as string;
+        const isActive = formData.get("isActive") === "true";
 
-        await db.update(usersTable).set({ name }).where(eq(usersTable.id, id));
+        const updatedUser = await db
+            .select()
+            .from(usersTable)
+            .where(eq(usersTable.id, id));
+
+        if (updatedUser.length === 0) {
+            return {
+                success: false,
+                error: "User not found",
+            };
+        }
+
+        await db
+            .update(usersTable)
+            .set({
+                name: name ?? updatedUser[0].name,
+                isActive: isActive ?? updatedUser[0].isActive,
+            })
+            .where(eq(usersTable.id, id));
         revalidatePath("/");
         return {
             success: true,

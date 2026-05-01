@@ -2,14 +2,11 @@ import { db } from "@/lib/db";
 import { usersTable } from "@/lib/db/schema";
 import { like, or } from "drizzle-orm";
 import DeleteUserButton from "./delete-user-button";
+import UserBadge from "./user-badge";
 
 async function getUsers() {
     const users = await db
-        .select({
-            id: usersTable.id,
-            name: usersTable.name,
-            email: usersTable.email,
-        })
+        .select()
         .from(usersTable)
         .where(or(like(usersTable.email, "%gmail%")))
         .orderBy(usersTable.id);
@@ -35,7 +32,7 @@ export default async function Home() {
                             <div>
                                 <p className="font-bold">{user.name}</p>
                                 <p className="text-sm text-gray-500">
-                                    {user.email}
+                                    {user.email} <UserBadge user={user} />
                                 </p>
                             </div>
                             {/* We will create this component in Step 3 */}
