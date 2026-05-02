@@ -8,13 +8,15 @@ import { Input } from "./ui/input";
 export default function CreatePostForm({ userId }: { userId: number }) {
     async function handlePostSubmit(e: React.ChangeEvent<HTMLFormElement>) {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
+        const form = e.currentTarget;
+        const formData = new FormData(form);
 
         const result = await createPost(formData);
         if (!result.success) {
             toast.error(result.error || "Failed to create post");
         } else {
             toast.success("Post created successfully");
+            form.reset();
         }
     }
 
