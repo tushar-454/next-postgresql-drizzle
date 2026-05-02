@@ -1,15 +1,26 @@
 "use client";
 
 import { createPost } from "@/actions/actions";
+import { toast } from "sonner";
 import FormButton from "./form-button";
 import { Input } from "./ui/input";
 
 export default function CreatePostForm({ userId }: { userId: number }) {
+    async function handlePostSubmit(e: React.ChangeEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+
+        const result = await createPost(formData);
+        if (!result.success) {
+            toast.error(result.error || "Failed to create post");
+        } else {
+            toast.success("Post created successfully");
+        }
+    }
+
     return (
         <form
-            action={async (formData) => {
-                await createPost(formData);
-            }}
+            onSubmit={handlePostSubmit}
             className="flex flex-col gap-2"
         >
             <Input

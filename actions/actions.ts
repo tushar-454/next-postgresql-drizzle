@@ -2,12 +2,35 @@
 
 import { db } from "@/lib/db";
 import { postsTable, usersTable } from "@/lib/db/schema";
+import { createPostSchema, createUserSchema } from "@/lib/validations";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate";
 
 export async function createUser(formData: FormData) {
     const name = formData.get("name") as string;
     const email = formData.get("email") as string;
+
+    const result = createUserSchema.safeParse({ name, email });
+
+    if (!result.success) {
+        const errors = result.error.issues;
+        const fieldErrors: Record<string, string> = {};
+        console.log(errors);
+        for (const issue of errors) {
+            const key = issue.path.join(".") || "root";
+
+            if (!fieldErrors[key]) {
+                fieldErrors[key] = "";
+            }
+
+            fieldErrors[key] += issue.message + " ";
+        }
+        console.log(fieldErrors);
+        return {
+            success: false,
+            error: errors[0].message,
+        };
+    }
 
     try {
         const newUser = await db
@@ -92,6 +115,29 @@ export async function createPost(formData: FormData) {
         const title = formData.get("title") as string;
         const content = formData.get("content") as string;
         const userId = Number(formData.get("userId"));
+
+        const result = createPostSchema.safeParse({ title, content, userId });
+
+        if (!result.success) {
+            const errors = result.error.issues;
+            const fieldErrors: Record<string, string> = {};
+            console.log(errors);
+            for (const issue of errors) {
+                const key = issue.path.join(".") || "root";
+
+                if (!fieldErrors[key]) {
+                    fieldErrors[key] = "";
+                }
+
+                fieldErrors[key] = issue.message;
+            }
+            console.log(fieldErrors);
+            return {
+                success: false,
+                error: errors[0].message,
+            };
+        }
+
         await db.insert(postsTable).values({
             title,
             content,
